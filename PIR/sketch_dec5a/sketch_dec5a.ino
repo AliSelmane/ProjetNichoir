@@ -1,4 +1,4 @@
-const int PIR = 2;  // À adapter selon ta vraie broche
+const int PIR = 13;  // À adapter selon ta vraie broche
 
 void setup() {
   Serial.begin(9600);
