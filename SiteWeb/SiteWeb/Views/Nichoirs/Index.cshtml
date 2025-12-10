@@ -1,0 +1,332 @@
+﻿@model List<SiteWeb.Models.Nichoir>
+
+@{
+    ViewData["Title"] = "Nichoirs";
+    var total = Model?.Count ?? 0;
+    var avecEmplacement = Model?.Count(n => !string.IsNullOrWhiteSpace(n.Emplacement)) ?? 0;
+    var sansEmplacement = total - avecEmplacement;
+}
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<style>
+    /* Petites finitions premium */
+    .glass { background: rgba(255,255,255,.75); backdrop-filter: blur(10px); }
+    .soft-grid {
+        background-image:
+            radial-gradient(circle at 1px 1px, rgba(0,0,0,.06) 1px, transparent 0);
+        background-size: 16px 16px;
+    }
+</style>
+
+<div class="min-h-screen soft-grid">
+    <!-- Header -->
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-black/5 text-gray-700">
+                    <i class="fa-solid fa-wifi"></i>
+                    Dashboard • Projet Nichoir
+                </div>
+                <h1 class="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+                    Nichoirs connectés
+                </h1>
+                <p class="mt-1 text-gray-600">
+                    Gestion rapide : liste, consultation des détails, aperçu du parc.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input id="searchInput"
+                           type="text"
+                           placeholder="Rechercher (nom, chip, emplacement)…"
+                           class="w-full sm:w-80 rounded-2xl border border-gray-200 bg-white px-10 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-300" />
+                </div>
+
+                <button id="clearBtn"
+                        type="button"
+                        class="hidden sm:inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
+                    <i class="fa-solid fa-eraser"></i>
+                    Effacer
+                </button>
+            </div>
+        </div>
+
+        <!-- Cards stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+            <div class="glass rounded-3xl border border-white/50 shadow-lg p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600">Total nichoirs</p>
+                        <p class="text-3xl font-extrabold text-gray-900">@total</p>
+                    </div>
+                    <div class="h-12 w-12 rounded-2xl bg-blue-600/10 flex items-center justify-center">
+                        <i class="fa-solid fa-house-signal text-blue-700 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass rounded-3xl border border-white/50 shadow-lg p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600">Avec emplacement</p>
+                        <p class="text-3xl font-extrabold text-gray-900">@avecEmplacement</p>
+                    </div>
+                    <div class="h-12 w-12 rounded-2xl bg-emerald-600/10 flex items-center justify-center">
+                        <i class="fa-solid fa-location-dot text-emerald-700 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass rounded-3xl border border-white/50 shadow-lg p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600">Sans emplacement</p>
+                        <p class="text-3xl font-extrabold text-gray-900">@sansEmplacement</p>
+                    </div>
+                    <div class="h-12 w-12 rounded-2xl bg-amber-600/10 flex items-center justify-center">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-700 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
+            <!-- Top bar table -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gray-900 text-white">
+                        <i class="fa-solid fa-list"></i>
+                    </span>
+                    <div>
+                        <p class="font-extrabold text-gray-900">Liste</p>
+                        <p id="countLabel" class="text-sm text-gray-600">@total affiché(s)</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button type="button"
+                            data-sort="nom"
+                            class="sortBtn inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                        <i class="fa-solid fa-arrow-down-a-z"></i> Nom
+                    </button>
+                    <button type="button"
+                            data-sort="chip"
+                            class="sortBtn inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                        <i class="fa-solid fa-microchip"></i> Chip
+                    </button>
+                    <button type="button"
+                            data-sort="emp"
+                            class="sortBtn inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                        <i class="fa-solid fa-location-dot"></i> Emplacement
+                    </button>
+                </div>
+            </div>
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="p-10 text-center">
+                    <div class="mx-auto h-14 w-14 rounded-2xl bg-blue-600/10 flex items-center justify-center">
+                        <i class="fa-solid fa-box-open text-blue-700 text-2xl"></i>
+                    </div>
+                    <h2 class="mt-4 text-xl font-extrabold text-gray-900">Aucun nichoir</h2>
+                    <p class="mt-1 text-gray-600">Ajoute ton premier nichoir pour commencer.</p>
+                </div>
+            }
+            else
+            {
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr class="text-left text-gray-600">
+                                <th class="px-6 py-4 font-extrabold uppercase tracking-wider">Nichoir</th>
+                                <th class="px-6 py-4 font-extrabold uppercase tracking-wider">Chip ID</th>
+                                <th class="px-6 py-4 font-extrabold uppercase tracking-wider">Emplacement</th>
+                                <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rows" class="divide-y divide-gray-100">
+                            @foreach (var n in Model)
+                            {
+                                var emplacement = !string.IsNullOrWhiteSpace(n.Emplacement) ? n.Emplacement : "N/A";
+                                var chipShort = !string.IsNullOrWhiteSpace(n.ChipId) && n.ChipId.Length > 14 ? n.ChipId.Substring(0, 14) + "…" : n.ChipId;
+
+                                <tr class="row group hover:bg-gray-50 transition"
+                                    data-nom="@n.Nom"
+                                    data-chip="@n.ChipId"
+                                    data-emp="@emplacement">
+
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-blue-600/15 to-indigo-600/10 flex items-center justify-center border border-blue-600/10">
+                                                <i class="fa-solid fa-house-signal text-blue-700"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-extrabold text-gray-900 leading-tight">
+                                                    @n.Nom
+                                                </div>
+                                                <div class="text-xs text-gray-600 mt-1">
+                                                    ID: <span class="font-semibold text-gray-700">@n.Id</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <div class="inline-flex items-center gap-2 rounded-2xl bg-gray-900/5 px-3 py-2 border border-gray-200">
+                                            <i class="fa-solid fa-microchip text-gray-600"></i>
+                                            <span class="font-semibold text-gray-800" title="@n.ChipId">@chipShort</span>
+                                        </div>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        @if (emplacement == "N/A")
+                                        {
+                                            <span class="inline-flex items-center gap-2 rounded-full bg-amber-600/10 text-amber-800 px-3 py-1.5 font-bold">
+                                                <i class="fa-solid fa-triangle-exclamation"></i> Non défini
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center gap-2 rounded-full bg-emerald-600/10 text-emerald-800 px-3 py-1.5 font-bold">
+                                                <i class="fa-solid fa-location-dot"></i> @emplacement
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <div class="flex justify-end gap-2">
+                                            <a asp-action="Details"
+                                               asp-route-id="@n.Id"
+                                               class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 text-white px-4 py-2.5 font-extrabold shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                                <i class="fa-solid fa-eye"></i> Détails
+                                            </a>
+
+                                            <a asp-action="Edit"
+                                               asp-route-id="@n.Id"
+                                               class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 font-extrabold text-gray-700 shadow-sm hover:bg-gray-50">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+
+                                            <button type="button"
+                                                    class="btnDelete inline-flex items-center gap-2 rounded-2xl border border-red-200 bg-white px-4 py-2.5 font-extrabold text-red-700 shadow-sm hover:bg-red-50"
+                                                    data-id="@n.Id"
+                                                    data-nom="@n.Nom">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 py-4 border-t border-gray-200 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="text-sm text-gray-600">
+                        Astuce : tape <span class="font-semibold">ESP32</span>, un emplacement, ou un nom dans la barre de recherche.
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <i class="fa-solid fa-shield-halved mr-2"></i>
+                        Mode démo (sans DB)
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<form id="deleteForm" method="post" asp-controller="Nichoirs" asp-action="DeleteConfirmed" class="hidden">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteId" />
+</form>
+
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const countLabel = document.getElementById('countLabel');
+    const rowsBody = document.getElementById('rows');
+
+    function getRows() {
+        return Array.from(document.querySelectorAll('tr.row'));
+    }
+
+    function visibleCount() {
+        return getRows().filter(r => r.style.display !== 'none').length;
+    }
+
+    function updateCount() {
+        const n = visibleCount();
+        countLabel.textContent = `${n} affiché(s)`;
+    }
+
+    function normalize(s) {
+        return (s || '').toString().toLowerCase().trim();
+    }
+
+    function applyFilter() {
+        const q = normalize(searchInput.value);
+        getRows().forEach(r => {
+            const nom = normalize(r.dataset.nom);
+            const chip = normalize(r.dataset.chip);
+            const emp = normalize(r.dataset.emp);
+            const ok = !q || nom.includes(q) || chip.includes(q) || emp.includes(q);
+            r.style.display = ok ? '' : 'none';
+        });
+        updateCount();
+    }
+
+    function sortBy(field) {
+        if (!rowsBody) return;
+        const rows = getRows();
+        rows.sort((a, b) => {
+            const av = normalize(a.dataset[field]);
+            const bv = normalize(b.dataset[field]);
+            return av.localeCompare(bv);
+        });
+        rows.forEach(r => rowsBody.appendChild(r));
+        updateCount();
+    }
+
+    searchInput?.addEventListener('input', applyFilter);
+
+    clearBtn?.addEventListener('click', () => {
+        searchInput.value = '';
+        applyFilter();
+        searchInput.focus();
+    });
+
+    document.querySelectorAll('.sortBtn').forEach(btn => {
+        btn.addEventListener('click', () => sortBy(btn.dataset.sort));
+    });
+
+    // Init
+    updateCount();
+
+        // Delete confirm + POST
+    const deleteForm = document.getElementById('deleteForm');
+    const deleteId = document.getElementById('deleteId');
+
+    document.querySelectorAll('.btnDelete').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            const nom = btn.dataset.nom;
+
+            const ok = confirm(`Supprimer le nichoir "${nom}" (ID: ${id}) ?\n\nAction irréversible.`);
+            if (!ok) return;
+
+            deleteId.value = id;
+            deleteForm.submit();
+        });
+    });
+
+</script>
