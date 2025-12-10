@@ -5,8 +5,8 @@
 // ----------------------------------------------------
 // CONFIG WIFI
 // ----------------------------------------------------
-const char* ssid = "electroProjectWifi";
-const char* password = "B1MesureEnv";
+const char* ssid = "iPhone de Ali";
+const char* password = "crevard123";
 
 // ----------------------------------------------------
 // CONFIG MQTT
