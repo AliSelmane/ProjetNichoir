@@ -1,0 +1,45 @@
+// Projet: Surveillance de Nichoir (4 Tables)
+// Contrainte: Fusion des données de déclenchement et des métadonnées dans la table Evenement.
+
+// 1. Table: Nichoir (Unité ESP32)
+// Stocke les informations permanentes sur l'appareil.
+Table Nichoir {
+  id int [pk, increment]
+  nom varchar(50) [not null, unique]
+  localisation varchar(100)
+  
+  // Champs de statut et d'audit
+  est_actif boolean [default: true] 
+  derniere_connexion datetime // Dernière date/heure où l'ESP32 a contacté le RPI
+  niveau_batterie decimal(4, 2) // Pourcentage ou tension
+  date_mise_en_service datetime [default: `now()`]
+}
+
+// 2. Table: Evenement (Déclenchement PIR + Regroupement Média)
+// Cet enregistrement représente le cycle complet d'une visite/mouvement.
+Table Details {
+  id int [pk, increment]
+  nichoir_id int [ref: > Nichoir.id] // FOREIGN KEY: Lien vers l'unité
+  
+  nombre_media int [default: 0] // Nombre de photos/vidéos prises pour cet événement
+  
+  // Métadonnées techniques de l'ESP32
+  tension_alimentation decimal(4, 2) // Tension de la batterie ou de l'alimentation
+  
+
+}
+
+// 3. Table: RessourceMedia (Chaque image ou vidéo individuelle)
+// Enregistre les détails du fichier et la résolution.
+Table RessourceMedia {
+  id int [pk, increment]
+  evenement_id int [ref: > Details.id] // FOREIGN KEY: Lien vers l'événement parent
+  
+  // Infos du fichier
+  chemin_fichier varchar(255) [not null, unique] // Chemin RELATIF au dossier_media_racine
+  taille_octet int
+  resolution_pixels varchar(15) // Ex: "640x480"
+
+  date_capture datetime [default: `now()`] // Date précise de la capture de ce fichier
+}
+
