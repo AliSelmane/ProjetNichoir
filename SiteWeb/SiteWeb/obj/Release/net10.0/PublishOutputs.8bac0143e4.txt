@@ -1,0 +1,12 @@
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\SiteWeb.exe
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\appsettings.Development.json
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\appsettings.json
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\SiteWeb.dll
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\SiteWeb.runtimeconfig.json
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\SiteWeb.pdb
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\Microsoft.EntityFrameworkCore.dll
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\MySqlConnector.dll
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\Pomelo.EntityFrameworkCore.MySql.dll
+C:\Users\Al-zubaidi\Desktop\SiteWeb\SiteWeb\obj\Release\net10.0\PubTmp\Out\SiteWeb.deps.json

@@ -1,6 +1,17 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+
+var connectionString = builder.Configuration.GetConnectionString("NichoirDb");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)
+    )
+);
 
 var app = builder.Build();
 
@@ -17,9 +28,26 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-// ✅ Route par défaut => Nichoirs/Index (PAS NichoirsController)
+// Route par défaut => Nichoirs/Index (PAS NichoirsController)
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Nichoirs}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate(); // Applique les migrations automatiquement
+        Console.WriteLine("Tables créées/mises à jour avec succès !");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Erreur migration : " + ex.Message);
+    }
+}
+
+app.Run(); // Cette ligne existe déjà normalement
 
 app.Run();

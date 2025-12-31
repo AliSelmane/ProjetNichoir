@@ -1,0 +1,239 @@
+﻿@model SiteWeb.Models.Details
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<div class="max-w-7xl mx-auto p-6 space-y-8">
+
+    <!-- ================= INFO NICHOIR ================= -->
+    <div class="bg-white rounded-3xl shadow-xl p-6 border">
+        <h1 class="text-3xl font-extrabold">@Model.Nichoir.Nom</h1>
+        <div class="mt-2 text-gray-600 space-y-1">
+            <div><i class="fa-solid fa-microchip"></i> @Model.Nichoir.ChipId</div>
+            <div>
+                <i class="fa-solid fa-location-dot"></i>
+                @(!string.IsNullOrWhiteSpace(Model.Nichoir.Emplacement) ? Model.Nichoir.Emplacement : "Non défini")
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= GALERIE ================= -->
+    <div class="bg-white rounded-3xl shadow-xl border">
+
+        <!-- Header -->
+        <div class="px-6 py-4 border-b flex justify-between items-center">
+            <h2 class="text-xl font-extrabold">📁 Albums</h2>
+
+            <button id="addAlbumBtn"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold">
+                ➕ Ajouter un album
+            </button>
+        </div>
+
+        <!-- Albums -->
+        <div id="albumsView" class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+        <!-- Images -->
+        <div id="imagesView" class="hidden p-6 space-y-6">
+
+            <!-- Toolbar -->
+            <div class="flex flex-wrap gap-4 items-center">
+                <button id="backBtn" class="text-blue-600 font-semibold">
+                    ← Retour
+                </button>
+
+                <select id="sortSelect" class="h-10 rounded-xl border px-3 text-sm">
+                    <option value="desc">Plus récent → plus ancien</option>
+                    <option value="asc">Plus ancien → plus récent</option>
+                </select>
+
+                <input type="date" id="dateFrom" class="h-10 rounded-xl border px-3 text-sm" />
+                <input type="date" id="dateTo" class="h-10 rounded-xl border px-3 text-sm" />
+            </div>
+
+            <div id="gallery"
+                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SUPPRIMER NICHOIR ================= -->
+    <form action="@Url.Action("DeleteNichoir", "Nichoirs", new { id = Model.Nichoir.Id })"
+          method="post"
+          onsubmit="return confirm('Supprimer définitivement ce nichoir ?')"
+          class="bg-white rounded-3xl shadow-xl border p-6">
+        <button class="w-full h-12 bg-red-500 text-white rounded-2xl font-semibold">
+            <i class="fa-solid fa-trash"></i> Supprimer le nichoir
+        </button>
+    </form>
+</div>
+
+<!-- ================= LIGHTBOX ================= -->
+<div id="lightbox" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50"
+     onclick="this.classList.add('hidden')">
+    <img id="lightboxImg" class="max-w-[90vw] max-h-[90vh]" />
+</div>
+
+<script>
+    /* ================= ALBUMS (DB) ================= */
+    const albums = [
+    @foreach (var a in Model.Albums)
+    {
+        @: { id:@a.Id, nom:"@a.Nom" },
+    }
+    ];
+
+    const generalAlbumId = albums.find(a => a.nom === "Général")?.id ?? null;
+
+    /* ================= MEDIAS (DB) ================= */
+    const medias = [
+    @foreach (var m in Model.Medias)
+    {
+        @: {
+        @:   id:@m.Id,
+        @:   albumId:@(m.AlbumId.HasValue? m.AlbumId.Value : -1),
+        @:   date:@m.CapturedAt.Ticks,
+        @:   day:"@m.CapturedAt.ToString("yyyy-MM-dd")",
+        @:   label:"@m.CapturedAt.ToString("dd/MM/yyyy HH:mm")",
+        @:   src:"@m.Chemin"
+        @: },
+    }
+    ];
+
+    let currentAlbumId = albums.find(a => a.nom === "Général")?.id ?? albums[0]?.id;
+
+    /* ================= DOM ================= */
+    const albumsView = document.getElementById('albumsView');
+    const imagesView = document.getElementById('imagesView');
+    const gallery = document.getElementById('gallery');
+    const sortSelect = document.getElementById('sortSelect');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+
+    /* ================= RENDER ================= */
+    function renderAlbums() {
+        albumsView.innerHTML = '';
+
+        albums.forEach(a => {
+            const count = medias.filter(m =>
+                m.albumId === a.id || (m.albumId === -1 && a.id === generalAlbumId)
+            ).length;
+
+            albumsView.innerHTML += `
+                <div class="border rounded-2xl p-5 shadow-sm hover:shadow-lg cursor-pointer"
+                     onclick="openAlbum(${a.id})">
+                    <h3 class="font-extrabold">${a.nom}</h3>
+                    <p class="text-sm text-gray-500">${count} image(s)</p>
+                </div>`;
+        });
+    }
+
+    function openAlbum(albumId) {
+        currentAlbumId = albumId;
+        albumsView.classList.add('hidden');
+        imagesView.classList.remove('hidden');
+        renderImages();
+    }
+
+    function renderImages() {
+        let imgs = medias.filter(m =>
+            m.albumId === currentAlbumId ||
+            (m.albumId === -1 && currentAlbumId === generalAlbumId)
+        );
+
+        if (dateFrom.value) imgs = imgs.filter(i => i.day >= dateFrom.value);
+        if (dateTo.value) imgs = imgs.filter(i => i.day <= dateTo.value);
+
+        imgs.sort((a, b) =>
+            sortSelect.value === 'desc' ? b.date - a.date : a.date - b.date
+        );
+
+        gallery.innerHTML = imgs.map(i => `
+            <div class="border rounded-2xl overflow-hidden shadow-sm bg-white">
+                <div class="relative">
+                    <img src="${i.src}"
+                         class="h-48 w-full object-cover cursor-pointer"
+                         onclick="openLightbox('${i.src}')">
+
+                    <button onclick="toggleFav(${i.id})"
+                            class="absolute top-2 right-2 h-9 w-9 rounded-full
+                                   flex items-center justify-center
+                                   bg-white/90 shadow">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="p-3 space-y-2 text-xs text-gray-600">
+                    <div>${i.label}</div>
+
+                    <select onchange="moveToAlbum(${i.id}, this.value)"
+                            class="w-full h-8 rounded-lg border px-2 text-xs">
+                        ${albums.map(a =>
+                            `<option value="${a.id}" ${a.id === i.albumId ? 'selected' : ''}>${a.nom}</option>`
+                        ).join('')}
+                    </select>
+
+                    <form action="/Nichoirs/DeleteImage/${i.id}"
+                          method="post"
+                          onsubmit="return confirm('Supprimer cette image ?')">
+                        <button class="text-red-500 flex items-center gap-1">
+                            <i class="fa-solid fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /* ================= ACTIONS ================= */
+    function toggleFav(id) {
+        fetch('/Nichoirs/ToggleFavorite', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${id}`
+        }).then(() => location.reload());
+    }
+
+    function moveToAlbum(id, albumId) {
+        fetch('/Nichoirs/MoveToAlbum', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `mediaId=${id}&albumId=${albumId}`
+        }).then(() => location.reload());
+    }
+
+    function openLightbox(src) {
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightbox').classList.remove('hidden');
+    }
+
+    /* ================= EVENTS ================= */
+    document.getElementById('backBtn').onclick = () => {
+        imagesView.classList.add('hidden');
+        albumsView.classList.remove('hidden');
+    };
+
+    sortSelect.onchange = renderImages;
+    dateFrom.onchange = renderImages;
+    dateTo.onchange = renderImages;
+
+    document.getElementById('addAlbumBtn').onclick = () => {
+        const name = prompt("Nom du nouvel album :");
+        if (!name) return;
+
+        fetch('/Nichoirs/CreateAlbum', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `nichoirId=@Model.Nichoir.Id&name=${encodeURIComponent(name)}`
+        }).then(() => location.reload());
+    };
+
+    /* ================= INIT ================= */
+    renderAlbums();
+
+    // OUVRIR AUTOMATIQUEMENT L'ALBUM "Général"
+    const general = albums.find(a => a.nom.toLowerCase() === 'Général');
+    if (general) {
+        openAlbum(general.id);
+    }
+</script>
