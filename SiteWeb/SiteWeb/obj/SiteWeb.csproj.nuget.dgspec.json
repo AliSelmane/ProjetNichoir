@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Al-zubaidi\\Desktop\\SiteWeb\\SiteWeb\\SiteWeb.csproj": {}
+    "E:\\Sm\\Iot\\ESP32\\SiteWeb\\SiteWeb\\SiteWeb.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Al-zubaidi\\Desktop\\SiteWeb\\SiteWeb\\SiteWeb.csproj": {
+    "E:\\Sm\\Iot\\ESP32\\SiteWeb\\SiteWeb\\SiteWeb.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Al-zubaidi\\Desktop\\SiteWeb\\SiteWeb\\SiteWeb.csproj",
+        "projectUniqueName": "E:\\Sm\\Iot\\ESP32\\SiteWeb\\SiteWeb\\SiteWeb.csproj",
         "projectName": "SiteWeb",
-        "projectPath": "C:\\Users\\Al-zubaidi\\Desktop\\SiteWeb\\SiteWeb\\SiteWeb.csproj",
+        "projectPath": "E:\\Sm\\Iot\\ESP32\\SiteWeb\\SiteWeb\\SiteWeb.csproj",
         "packagesPath": "C:\\Users\\Al-zubaidi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Al-zubaidi\\Desktop\\SiteWeb\\SiteWeb\\obj\\",
+        "outputPath": "E:\\Sm\\Iot\\ESP32\\SiteWeb\\SiteWeb\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -51,23 +51,29 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
-            "Microsoft.EntityFrameworkCore.SqlServer": {
+            "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[10.0.0-rc.1.25451.107, )"
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.0, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.0-rc.1.25451.107, )"
+              "version": "[8.0.0, )"
             },
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.23.0, )"
             },
-            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+            "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
-              "version": "[10.0.0-rc.1.25458.5, )"
+              "version": "[8.0.0, )"
             }
           },
           "imports": [

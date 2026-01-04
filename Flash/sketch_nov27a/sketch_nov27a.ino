@@ -4,9 +4,9 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  pinMode(2, OUTPUT);
+  pinMode(13, OUTPUT);
 }
 
 void loop() {
-  digitalWrite(2, HIGH);
+  digitalWrite(13, HIGH);
 }
