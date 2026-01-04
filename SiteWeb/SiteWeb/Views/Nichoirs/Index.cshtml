@@ -35,7 +35,6 @@
             </h1>
         </div>
 
-        <!-- Cards stats (INFO ONLY) -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
             <div class="glass rounded-3xl border border-white/50 shadow-lg p-5">
                 <p class="text-sm font-semibold text-gray-600">Total nichoirs</p>
@@ -72,7 +71,6 @@
                     </div>
                 </div>
 
-                <!-- 🔍 Recherche -->
                 <div class="flex items-center gap-2">
 
                     <select id="searchField"
@@ -191,7 +189,6 @@
         searchInput.focus();
     });
 
-    /* 🖱️ Clic sur une ligne → page Details */
     const detailsBaseUrl = '@Url.Action("Details", "Nichoirs")';
 
     rows().forEach(row => {

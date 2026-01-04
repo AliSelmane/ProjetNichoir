@@ -61,18 +61,14 @@ public class ApplicationDbContext : DbContext
             .Property(r => r.Trigger)
             .HasMaxLength(16);
 
-        // ---------------------------
-        // Relation : 1 Nichoir → N RessourceMedia
-        // ---------------------------
+
         modelBuilder.Entity<ressources_media>()
             .HasOne<nichoirs>()                        // un média appartient à un nichoir
             .WithMany()                               // un nichoir peut avoir plusieurs médias
             .HasForeignKey(r => r.NichoirId)          // FK dans RessourceMedia
-            .OnDelete(DeleteBehavior.Cascade);        // si nichoir supprimé → supprime les médias
+            .OnDelete(DeleteBehavior.Cascade);       
 
-        // ---------------------------
-        // Table : Albums
-        // ---------------------------
+
         modelBuilder.Entity<Album>()
             .ToTable("albums")
             .HasKey(a => a.Id);

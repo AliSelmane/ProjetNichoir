@@ -28,7 +28,6 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-// Route par défaut => Nichoirs/Index (PAS NichoirsController)
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Nichoirs}/{action=Index}/{id?}");
@@ -39,7 +38,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate(); // Applique les migrations automatiquement
+        context.Database.Migrate(); 
         Console.WriteLine("Tables créées/mises à jour avec succès !");
     }
     catch (Exception ex)
@@ -48,6 +47,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.Run(); // Cette ligne existe déjà normalement
+app.Run(); 
 
 app.Run();

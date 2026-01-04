@@ -3,7 +3,7 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 
-class GestionnaireWiFi {
+class GWifi {
 public:
   WebServer serveur;
   DNSServer dns;
@@ -49,13 +49,12 @@ public:
   }
 
 public:
-  GestionnaireWiFi()
+  GWifi()
     : serveur(80) {}
 
 
   void lancerConfiguration() {
     donneesRecues = false;
-    Serial.println("----------------------------------------------");
     Serial.println("[MODE] Activation du mode Configuration");
 
     WiFi.mode(WIFI_AP_STA);
@@ -98,7 +97,6 @@ public:
   }
 
   bool tenterConnexion() {
-    Serial.println("----------------------------------------------");
     Serial.printf("[WIFI] Tentative de connexion à : %s\n", ssidLocal.c_str());
     WiFi.begin(ssidLocal.c_str(), passeLocal.c_str());
 
@@ -114,7 +112,6 @@ public:
       Serial.printf("[DATA] Nom : %s | Lieu : %s\n", nomNichoir.c_str(), localisation.c_str());
       WiFi.softAPdisconnect(true);
       Serial.println("[AP] Point d'accès désactivé.");
-      Serial.println("----------------------------------------------");
 
       return true;
     } else {
@@ -127,8 +124,7 @@ public:
 
   void sauvegarderConfig() {
     Preferences prefs;
-    prefs.begin("n-cfg", false);  // "n-cfg" est le nom du namespace
-
+    prefs.begin("n-cfg", false);  
     prefs.putString("s", ssidLocal);
     prefs.putString("p", passeLocal);
     prefs.putString("n", nomNichoir);
@@ -140,7 +136,7 @@ public:
 
   bool chargerConfig() {
     Preferences prefs;
-    prefs.begin("n-cfg", true);  // lecture seule
+    prefs.begin("n-cfg", true); 
 
     ssidLocal = prefs.getString("s", "");
     passeLocal = prefs.getString("p", "");
@@ -154,7 +150,6 @@ public:
     Serial.printf("  Nom  : %s\n", nomNichoir.c_str());
     Serial.printf("  Lieu : %s\n", localisation.c_str());
 
-    // Vérification simple de validité
     if (ssidLocal.length() < 2 || passeLocal.length() < 2) {
       Serial.println("[MEMOIRE] Configuration invalide ou absente.");
       return false;

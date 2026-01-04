@@ -120,9 +120,6 @@ namespace SiteWeb.Controllers
             return Ok(album.Id);
         }
 
-        // ==========================================
-        // 5. BASCULER EN FAVORI (Toggle)
-        // ==========================================
         [HttpPost]
         public IActionResult ToggleFavorite(long id) // id est long ici
         {
@@ -159,9 +156,6 @@ namespace SiteWeb.Controllers
             return RedirectToAction("Details", new { id = nichoirId });
         }
 
-        // ==========================================
-        // 7. SUPPRIMER UN NICHOIR (Et ses contenus)
-        // ==========================================
         [HttpPost]
         public IActionResult DeleteNichoir(int id)
         {
